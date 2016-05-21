@@ -1,0 +1,6 @@
+name: ${name}
+main: ${groupId}.${artifactId}
+author: ProjectInfinity
+version: ${version}
+api: ["1.0.0"]
+description: Simple, elegant and efficient voting suite.
