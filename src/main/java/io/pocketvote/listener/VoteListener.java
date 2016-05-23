@@ -6,6 +6,7 @@ import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import io.pocketvote.PocketVote;
+import io.pocketvote.event.VoteDispatchEvent;
 import io.pocketvote.event.VoteEvent;
 import io.pocketvote.util.VoteManager;
 
@@ -64,6 +65,7 @@ public class VoteListener implements Listener {
         while(votes.hasNext()) {
             HashMap<String, String> vote = votes.next();
             if(!vote.get("player").equalsIgnoreCase(event.getPlayer().getName())) continue;
+            plugin.getServer().getPluginManager().callEvent(new VoteDispatchEvent(vote.get("player"), vote.get("ip"), vote.get("site")));
             for(String cmd : plugin.cmdos) {
                 plugin.getServer().dispatchCommand(sender, cmd
                         .replaceAll("%player", vote.get("player"))
