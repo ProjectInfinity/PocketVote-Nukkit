@@ -73,7 +73,7 @@ public class PocketVoteCommand extends Command implements PluginIdentifiableComm
                         sender.sendMessage(TextFormat.YELLOW + "cmd, these run when a vote is made:");
                         for(String cmd : plugin.cmds) {
                             i++;
-                            sender.sendMessage((color ? TextFormat.WHITE : TextFormat.GRAY) + i + "/" + cmd);
+                            sender.sendMessage((color ? TextFormat.WHITE : TextFormat.GRAY) + Integer.toString(i) + "/" + cmd);
                             color = !color;
                         }
                         break;
@@ -134,7 +134,7 @@ public class PocketVoteCommand extends Command implements PluginIdentifiableComm
                         sender.sendMessage(TextFormat.YELLOW + "cmdo, these run when the player is online:");
                         for(String cmd : plugin.cmdos) {
                             i++;
-                            sender.sendMessage((color ? TextFormat.WHITE : TextFormat.GRAY) + i + "/" + cmd);
+                            sender.sendMessage((color ? TextFormat.WHITE : TextFormat.GRAY) + Integer.toString(i) + "/" + cmd);
                             color = !color;
                         }
                         break;

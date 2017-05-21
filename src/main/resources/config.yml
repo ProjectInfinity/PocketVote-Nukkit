@@ -1,7 +1,17 @@
-version: 1
+version: 3
+development: false
 identity: ''
 secret: ''
 lock: false
+multi-server:
+  enabled: false
+  role: 'master'
+  mysql:
+    host: 'localhost'
+    port: 3306
+    username: 'pocketvote'
+    password: 'pocketvote'
+    database: 'pocketvote'
 onvote:
   run-cmd:
   - 'say Thanks for voting for us at %site, %player!'

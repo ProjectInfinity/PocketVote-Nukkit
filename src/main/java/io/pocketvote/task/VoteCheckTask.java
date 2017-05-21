@@ -26,29 +26,36 @@ public class VoteCheckTask extends AsyncTask {
     private String identity;
     private String secret;
     private String version;
+    private boolean dev;
 
     public VoteCheckTask(PocketVote plugin, String identity, String secret, String version) {
         this.plugin = plugin;
         this.identity = identity;
         this.secret = secret;
         this.version = version;
+        this.dev = plugin.isDev();
     }
 
     @Override
     public void onRun() {
         plugin.getLogger().debug("Checking for outstanding votes.");
-        String url = "https://api.pocketvote.io/check";
+        String url = dev ? "http://127.0.0.1:9000/check" : "https://api.pocketvote.io/check";
 
         try {
 
             URL obj = new URL(url);
             HttpURLConnection con;
-            con = (HttpsURLConnection) obj.openConnection();
+            if(!dev) {
+                con = (HttpsURLConnection) obj.openConnection();
+            } else {
+                con = (HttpURLConnection) obj.openConnection();
+            }
+
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", "PocketVote Nukkit v" + version);
             con.setRequestProperty("Identity", identity);
 
-            //int responseCode = con.getResponseCode();
+            int responseCode = con.getResponseCode();
 
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
@@ -82,7 +89,11 @@ public class VoteCheckTask extends AsyncTask {
         if(hasResult()) {
             if(getResult() instanceof DefaultClaims) {
                 DefaultClaims claims = (DefaultClaims) getResult();
-                claims.values().stream().filter(o -> o instanceof LinkedHashMap).forEach(o -> server.getPluginManager().callEvent(new VoteEvent(((LinkedHashMap) o).get("player").toString(), ((LinkedHashMap) o).get("ip").toString(), ((LinkedHashMap) o).get("site").toString())));
+                claims.values().stream().filter(o -> o instanceof LinkedHashMap).forEach(o -> {
+                    LinkedHashMap<String, String> vote = ((LinkedHashMap) o);
+                    if(!vote.containsKey("ip")) vote.put("ip", "127.0.0.1");
+                    server.getPluginManager().callEvent(new VoteEvent(vote.get("player"), vote.get("ip") , vote.get("site")));
+                });
             }
         }
     }
