@@ -53,8 +53,6 @@ public class PocketVote extends PluginBase {
     public String mysqlPassword;
     public String mysqlDatabase;
 
-    private SSLContext sslContext;
-
     @Override
     public void onEnable() {
         plugin = this;
@@ -63,39 +61,6 @@ public class PocketVote extends PluginBase {
         updateConfig();
 
         vm = new VoteManager(plugin);
-
-        plugin.getLogger().warning("Let's Encrypt is currently unsupported by Java, Oracle is scheduled to release a Java update in July 2016 that adds support. Until then SSL verification is disabled.");
-        TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    @Override
-                    public void checkClientTrusted(java.security.cert.X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    }
-
-                    @Override
-                    public void checkServerTrusted(java.security.cert.X509Certificate[] x509Certificates, String s) throws CertificateException {
-                    }
-
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                }
-        };
-
-        try {
-            sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            e.printStackTrace();
-        }
-
-        if(sslContext != null) HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-
-        HostnameVerifier allHostsValid = new HostnameVerifier() {
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        };
 
         if(!Files.isDirectory(Paths.get(getServer().getPluginPath() + "libs"))) {
             getLogger().warning("Could not find library directory.");

@@ -10,9 +10,8 @@
     </properties>
     <repositories>
         <repository>
-            <id>projectinfinity-repo</id>
-            <name>ProjectInfinity repository</name>
-            <url>http://ci.regularbox.com/plugin/repository/everything/</url>
+            <id>potestas-repo</id>
+            <url>https://repo.potestas.xyz/main</url>
         </repository>
     </repositories>
     <dependencies>
