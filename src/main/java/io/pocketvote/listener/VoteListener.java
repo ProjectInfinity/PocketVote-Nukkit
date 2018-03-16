@@ -54,6 +54,8 @@ public class VoteListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
+        if(plugin.useVRC) vm.scheduleVRCTask(event.getPlayer().getName());
+
         if(!vm.hasVotes(event.getPlayer().getName())) return;
 
         ConsoleCommandSender sender = plugin.getServer().getConsoleSender();

@@ -2,13 +2,14 @@ package io.pocketvote;
 
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.TextFormat;
+import io.pocketvote.data.VRCRecord;
 import io.pocketvote.listener.VoteListener;
 import io.pocketvote.cmd.PocketVoteCommand;
 import io.pocketvote.task.SlaveCheckTask;
 import io.pocketvote.task.VoteCheckTask;
+import io.pocketvote.util.ToolBox;
 import io.pocketvote.util.VoteManager;
 
-import javax.net.ssl.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -16,10 +17,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -43,6 +42,7 @@ public class PocketVote extends PluginBase {
     public String secret;
 
     public boolean lock;
+    public boolean useVRC;
 
     public boolean multiserver;
     public String multiserverRole;
@@ -96,6 +96,14 @@ public class PocketVote extends PluginBase {
                 getLogger().warning("MySQL library not found.");
                 downloadMySQL();
             }
+        }
+
+        // Load VRCs, if any.
+        try {
+            vm.loadVRCs();
+        } catch (IOException e) {
+            getServer().getLogger().alert("An exception was raised when attempting to load VRC files.");
+            e.printStackTrace();
         }
 
         getServer().getPluginManager().registerEvents(new VoteListener(plugin), plugin);

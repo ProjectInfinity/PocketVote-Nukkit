@@ -1,7 +1,19 @@
 package io.pocketvote.util;
 
+import cn.nukkit.scheduler.TaskHandler;
+import cn.nukkit.utils.TextFormat;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.pocketvote.PocketVote;
+import io.pocketvote.data.VRCRecord;
+import io.pocketvote.task.VRCCheckTask;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,10 +23,15 @@ public class VoteManager {
     private PocketVote plugin;
 
     private ArrayList<HashMap<String, String>> votes;
+    private ArrayList<VRCRecord> vrcs;
+
+    private HashMap<String, TaskHandler> vrcTasks;
 
     public VoteManager(PocketVote plugin) {
         this.plugin = plugin;
         this.votes = plugin.getConfig().get("votes", new ArrayList<>());
+        this.vrcs = new ArrayList<>();
+        this.vrcTasks = new HashMap<>();
     }
 
     public boolean hasVotes(String player) {
@@ -52,6 +69,60 @@ public class VoteManager {
     public void commit() {
         plugin.getConfig().set("votes", votes);
         plugin.saveConfig();
+    }
+
+    public void loadVRCs() throws IOException {
+        File vrcDir = new File(plugin.getServer().getPluginPath() + "PocketVote/vrc");
+
+        if(!vrcDir.isDirectory()) return;
+
+        File[] files = vrcDir.listFiles((file, name) -> name.endsWith(".vrc"));
+        if(files == null) {
+            plugin.getLogger().error("The VRC directory returned NULL when attempting to list files.");
+            return;
+        }
+
+        for(File file : files) {
+            String content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode json = mapper.readTree(content);
+
+            if(!json.hasNonNull("website") || !json.hasNonNull("check") || !json.hasNonNull("claim")) {
+                plugin.getLogger().error("The VRC file located at " + file.getAbsolutePath() + " is missing one or more required fields. We won't load this file.");
+                return;
+            }
+
+            VRCRecord vrc = new VRCRecord(
+                    json.get("website").asText(),
+                    json.get("check").asText(),
+                    json.get("claim").asText()
+            );
+
+            vrcs.add(vrc);
+            plugin.getLogger().info(TextFormat.GREEN + "VRC enabled for " + vrc.getWebsiteUrl());
+        }
+
+        if(vrcs.size() > 0) plugin.useVRC = true;
+    }
+
+    public VRCRecord[] getVRCs() {
+        return vrcs.toArray(new VRCRecord[0]);
+    }
+
+    public void scheduleVRCTask(String player) {
+        if(plugin.useVRC && !plugin.multiserver || (plugin.useVRC && plugin.multiserverRole.equals("master"))) {
+
+            if(vrcTasks.containsKey(player)) return;
+            // Only run when VRC is enabled and multiserver is off or VRC is enabled and multiserver and server role is set to master.
+            TaskHandler handler = plugin.getServer().getScheduler().scheduleAsyncTask(this.plugin, new VRCCheckTask(this.plugin, player));
+            vrcTasks.put(player, handler);
+        }
+    }
+
+    public void removeVRCTask(String player) {
+        if(!vrcTasks.containsKey(player)) return;
+        vrcTasks.remove(player);
     }
 
 }
