@@ -9,25 +9,25 @@ public class TaskResult {
 
     private ArrayList<JsonNode> votes;
     private boolean error;
-    private HashMap<String, ?> errorData;
+    private String errorMessage;
     private HashMap<String, ?> meta;
 
     public TaskResult() {
         this.votes = new ArrayList<>();
         this.error = false;
-        this.errorData = new HashMap<>();
+        this.errorMessage = null;
     }
 
     public TaskResult(ArrayList<JsonNode> votes) {
         this.votes = votes;
-        this.errorData = new HashMap<>();
+        this.errorMessage = null;
         this.error = false;
     }
 
-    public TaskResult(ArrayList<JsonNode> votes, boolean error, HashMap<String, ?> errorData) {
+    public TaskResult(ArrayList<JsonNode> votes, boolean error, String errorMessage) {
         this.votes = votes;
         this.error = error;
-        this.errorData = errorData;
+        this.errorMessage = errorMessage;
     }
 
     public boolean hasError() {
@@ -38,12 +38,12 @@ public class TaskResult {
         this.error = error;
     }
 
-    public void setErrorData(HashMap<String, ?> errorData) {
-        this.errorData = errorData;
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
-    public HashMap<String, ?> getError() {
-        return this.errorData;
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
     public boolean hasVotes() {

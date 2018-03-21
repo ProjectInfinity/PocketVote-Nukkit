@@ -17,9 +17,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 public class VRCCheckTask extends AsyncTask {
 
@@ -113,7 +111,7 @@ public class VRCCheckTask extends AsyncTask {
     }
 
     private TaskResult createErrorResult(String message) {
-        return new TaskResult(null, true, (HashMap<String, ?>) Map.ofEntries(Map.entry("message", message)));
+        return new TaskResult(null, true, message);
     }
 
     private TaskResult createResult(boolean error, JsonNode json) {
@@ -123,9 +121,9 @@ public class VRCCheckTask extends AsyncTask {
 
         if(error) {
             if(json == null) {
-                result.setErrorData((HashMap<String, ?>) Map.ofEntries(Map.entry("message", "A error occurred during communication with a voting site.")));
+                result.setErrorMessage("A error occurred during communication with a voting site.");
             } else {
-                result.setErrorData((HashMap<String, ?>) Map.ofEntries(Map.entry("message", json.get("message").asText("An unspecified error occurred."))));
+                result.setErrorMessage(json.get("message").asText("An unspecified error occurred."));
             }
         } else {
             // Check if we had votes.
@@ -158,7 +156,7 @@ public class VRCCheckTask extends AsyncTask {
 
         for(TaskResult result : results) {
             if(result.hasError()) {
-                server.getLogger().error("[PocketVote] VRCCheckTask: An issue occurred, you can ignore this unless it happens often: " + result.getError().get("message"));
+                server.getLogger().error("[PocketVote] VRCCheckTask: An issue occurred, you can ignore this unless it happens often: " + result.getErrorMessage());
                 continue;
             }
 
