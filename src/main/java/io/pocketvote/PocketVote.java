@@ -1,28 +1,23 @@
 package io.pocketvote;
 
 import cn.nukkit.plugin.PluginBase;
+import cn.nukkit.scheduler.TaskHandler;
 import cn.nukkit.utils.TextFormat;
-import io.pocketvote.data.VRCRecord;
 import io.pocketvote.listener.VoteListener;
 import io.pocketvote.cmd.PocketVoteCommand;
+import io.pocketvote.task.SchedulerTask;
 import io.pocketvote.task.SlaveCheckTask;
 import io.pocketvote.task.VoteCheckTask;
-import io.pocketvote.util.ToolBox;
 import io.pocketvote.util.VoteManager;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +48,10 @@ public class PocketVote extends PluginBase {
     public String mysqlPassword;
     public String mysqlDatabase;
 
+    private TaskHandler schedulerTask;
+    private int schedulerTs = 0;
+    private int schedulerFreq = 60;
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -61,42 +60,6 @@ public class PocketVote extends PluginBase {
         updateConfig();
 
         vm = new VoteManager(plugin);
-
-        if(!Files.isDirectory(Paths.get(getServer().getPluginPath() + "libs"))) {
-            getLogger().warning("Could not find library directory.");
-            try {
-                Files.createDirectory(Paths.get(getServer().getPluginPath() + "libs"));
-                getLogger().warning("Created " + getServer().getPluginPath() + "libs.");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            downloadJacksonCore();
-            downloadJacksonDatabind();
-            downloadJacksonAnnotations();
-            downloadJWT();
-            downloadMySQL();
-        } else {
-            if(!Files.exists(Paths.get(getServer().getPluginPath() + "libs/jackson-core-2.7.4.jar"))) {
-                getLogger().warning("Jackson-Core library not found.");
-                downloadJacksonCore();
-            }
-            if(!Files.exists(Paths.get(getServer().getPluginPath() + "libs/jackson-databind-2.7.4.jar"))) {
-                getLogger().warning("Jackson-Databind library not found.");
-                downloadJacksonDatabind();
-            }
-            if(!Files.exists(Paths.get(getServer().getPluginPath() + "libs/jackson-annotations-2.7.4.jar"))) {
-                getLogger().warning("Jackson-Annotations library not found.");
-                downloadJacksonAnnotations();
-            }
-            if(!Files.exists(Paths.get(getServer().getPluginPath() + "libs/jjwt-0.6.0.jar"))) {
-                getLogger().warning("JJWT library not found.");
-                downloadJWT();
-            }
-            if(!Files.exists(Paths.get(getServer().getPluginPath() + "libs/mysql-connector-java-5.1.39.jar"))) {
-                getLogger().warning("MySQL library not found.");
-                downloadMySQL();
-            }
-        }
 
         // Load VRCs, if any.
         try {
@@ -109,34 +72,16 @@ public class PocketVote extends PluginBase {
         getServer().getPluginManager().registerEvents(new VoteListener(plugin), plugin);
         getServer().getCommandMap().register("pocketvote", new PocketVoteCommand(plugin));
 
-        /** Register tasks **/
+        /* Register tasks */
         this.tasks = new ArrayList<>();
-        if(secret != null && !secret.isEmpty() && identity != null && !identity.isEmpty()) {
-            if(!multiserver || multiserverRole.equalsIgnoreCase("master")) tasks.add(getServer().getScheduler().scheduleRepeatingTask(new VoteCheckTask(plugin, identity, secret, getDescription().getVersion()), 1200, true).getTaskId());
-            if(multiserver && multiserverRole.equalsIgnoreCase("slave")) {
-                String hash = null;
-                try {
-                    MessageDigest md = MessageDigest.getInstance("MD5");
-                    md.update((getServer().getIp() + Integer.toString(getServer().getPort())).getBytes());
-                    byte[] digest = md.digest();
-                    StringBuilder sb = new StringBuilder();
-                    for (byte b : digest) {
-                        sb.append(String.format("%02x", b & 0xff));
-                    }
-                    hash = sb.toString();
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                }
-                tasks.add(getServer().getScheduler().scheduleRepeatingTask(new SlaveCheckTask(plugin, hash), 1200, true).getTaskId());
-            }
-        } else {
-            getLogger().critical("Please finish configuring PocketVote, then restart your server.");
-        }
+
+        schedulerTask = getServer().getScheduler().scheduleRepeatingTask(plugin, new SchedulerTask(plugin), 1200); // 1200 = 60 seconds.
     }
 
     @Override
     public void onDisable() {
-        for(int task : tasks) getServer().getScheduler().cancelTask(task);
+        for(int task : tasks) getServer().getScheduler().cancelTask(task); // TODO: Figure out if I can remove the tasks array.
+        getServer().getScheduler().cancelTask(schedulerTask.getTaskId());
         plugin = null;
     }
 
@@ -241,69 +186,22 @@ public class PocketVote extends PluginBase {
         return dev;
     }
 
-    private void downloadJacksonCore() {
-        try {
-            URL website = new URL("http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.7.4/jackson-core-2.7.4.jar");
-            FileOutputStream fos;
-            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-            fos = new FileOutputStream(getServer().getPluginPath() + "libs/jackson-core-2.7.4.jar");
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            getLogger().warning("Downloaded missing Jackson-Core library.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void stopScheduler() {
+        if(schedulerTask.isCancelled()) return;
+        schedulerTask.cancel();
     }
 
-    private void downloadJacksonDatabind() {
-        try {
-            URL website = new URL("http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.7.4/jackson-databind-2.7.4.jar");
-            FileOutputStream fos;
-            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-            fos = new FileOutputStream(getServer().getPluginPath() + "libs/jackson-databind-2.7.4.jar");
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            getLogger().warning("Downloaded missing Jackson-Databind library.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    public void startScheduler(int seconds) {
+        int time = (int) Instant.now().getEpochSecond();
+        // Ensure that at least 5 minutes has passed since we last changed frequency and check that the frequency is different from before.
+        if(time - schedulerTs < 300 || schedulerFreq == seconds) return;
+        stopScheduler();
 
-    private void downloadJacksonAnnotations() {
-        try {
-            URL website = new URL("http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.7.4/jackson-annotations-2.7.4.jar");
-            FileOutputStream fos;
-            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-            fos = new FileOutputStream(getServer().getPluginPath() + "libs/jackson-annotations-2.7.4.jar");
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            getLogger().warning("Downloaded missing Jackson-Annotations library.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+        schedulerTs = time;
+        schedulerTask = getServer().getScheduler().scheduleRepeatingTask(plugin, new SchedulerTask(plugin), seconds > 0 ? (seconds * 20) : 1200);
+        schedulerFreq = seconds;
 
-    private void downloadJWT() {
-        try {
-            URL website = new URL("http://central.maven.org/maven2/io/jsonwebtoken/jjwt/0.6.0/jjwt-0.6.0.jar");
-            FileOutputStream fos;
-            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-            fos = new FileOutputStream(getServer().getPluginPath() + "libs/jjwt-0.6.0.jar");
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            getLogger().warning("Downloaded missing JJWT library.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void downloadMySQL() {
-        try {
-            URL website = new URL("http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.39/mysql-connector-java-5.1.39.jar");
-            FileOutputStream fos;
-            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-            fos = new FileOutputStream(getServer().getPluginPath() + "libs/mysql-connector-java-5.1.39.jar");
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            getLogger().warning("Downloaded missing MySQL library.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        getLogger().debug("Scheduler interval changed to " + seconds + " seconds.");
     }
 
 }

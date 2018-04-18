@@ -5,6 +5,8 @@ import cn.nukkit.scheduler.AsyncTask;
 import io.pocketvote.PocketVote;
 import io.pocketvote.util.ToolBox;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,14 +23,26 @@ public class SlaveCheckTask extends AsyncTask {
 
     public String hash;
 
-    public SlaveCheckTask(PocketVote plugin, String hash) {
+    public SlaveCheckTask(PocketVote plugin) {
         this.plugin = plugin;
         this.mysqlHost = plugin.mysqlHost;
         this.mysqlPort = plugin.mysqlPort;
         this.mysqlUsername = plugin.mysqlUsername;
         this.mysqlPassword = plugin.mysqlPassword;
         this.mysqlDatabase = plugin.mysqlDatabase;
-        this.hash = hash;
+        this.hash = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update((plugin.getServer().getIp() + Integer.toString(plugin.getServer().getPort())).getBytes());
+            byte[] digest = md.digest();
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest) {
+                sb.append(String.format("%02x", b & 0xff));
+            }
+            this.hash = sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

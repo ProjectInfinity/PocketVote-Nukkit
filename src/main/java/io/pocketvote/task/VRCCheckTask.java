@@ -18,6 +18,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class VRCCheckTask extends AsyncTask {
 
@@ -121,18 +123,24 @@ public class VRCCheckTask extends AsyncTask {
 
         if(error) {
             if(json == null) {
-                result.setErrorMessage("A error occurred during communication with a voting site.");
+                result.setMessage("A error occurred during communication with a voting site.");
             } else {
-                result.setErrorMessage(json.get("message").asText("An unspecified error occurred."));
+                result.setMessage(json.get("message").asText("An unspecified error occurred."));
             }
         } else {
             // Check if we had votes.
             if(json.hasNonNull("payload") && json.get("success").asBoolean(false)) {
                 if(!json.get("payload").isArray()) return result;
-                ArrayList<JsonNode> votes = new ArrayList<>();
+                ArrayList<LinkedHashMap<String, String>> votes = new ArrayList<>();
                 for(final JsonNode j : json.get("payload")) {
-                    votes.add(j);
+                    LinkedHashMap<String, String> vote = new LinkedHashMap<>();
+                    vote.put("ip", json.get("ip").asText("127.0.0.1"));
+                    vote.put("player", json.get("player").asText());
+                    vote.put("site", json.get("site").asText());
+
+                    votes.add(vote);
                 }
+
                 result.setVotes(votes);
             }
         }
@@ -156,14 +164,14 @@ public class VRCCheckTask extends AsyncTask {
 
         for(TaskResult result : results) {
             if(result.hasError()) {
-                server.getLogger().error("[PocketVote] VRCCheckTask: An issue occurred, you can ignore this unless it happens often: " + result.getErrorMessage());
+                server.getLogger().error("[PocketVote] VRCCheckTask: An issue occurred, you can ignore this unless it happens often: " + result.getMessage());
                 continue;
             }
 
-            ArrayList<JsonNode> votes = result.getVotes();
+            ArrayList<LinkedHashMap<String, String>> votes = result.getVotes();
 
-            for(JsonNode vote : votes) {
-                server.getPluginManager().callEvent(new VoteEvent(vote.get("player").asText(), vote.get("ip").asText(), "VRC Site"));
+            for(LinkedHashMap<String, String> vote : votes) {
+                server.getPluginManager().callEvent(new VoteEvent(vote.get("player"), vote.get("ip"), "VRC Site"));
             }
         }
 
