@@ -6,13 +6,9 @@ import cn.nukkit.utils.TextFormat;
 import io.pocketvote.listener.VoteListener;
 import io.pocketvote.cmd.PocketVoteCommand;
 import io.pocketvote.task.SchedulerTask;
-import io.pocketvote.task.SlaveCheckTask;
-import io.pocketvote.task.VoteCheckTask;
 import io.pocketvote.util.VoteManager;
 
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -54,6 +50,14 @@ public class PocketVote extends PluginBase {
 
     @Override
     public void onEnable() {
+        /**
+         * TODO: Add GURU support.
+         * TODO: Add TopVoter
+         * TODO: Add Vote link.
+         * TODO: Add diagnose.
+         * TODO: Add heartbeat.
+         * TODO: Add expire.
+         */
         plugin = this;
         saveDefaultConfig();
         reloadSettings();
