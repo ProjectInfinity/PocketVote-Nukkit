@@ -1,8 +1,6 @@
 language: java
 jdk:
   - oraclejdk9
-script:
-  - mvn clean resources:resources install
 deploy:
   provider: releases
   api_key:
@@ -10,3 +8,4 @@ deploy:
   file: target/PocketVote.jar
   on:
     repo: ProjectInfinity/PocketVote-Nukkit
+    tags: true

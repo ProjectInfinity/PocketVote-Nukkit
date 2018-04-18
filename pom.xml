@@ -71,7 +71,8 @@
         </profile>
     </profiles>
     <build>
-        <finalName>${project.artifactId}</finalName>
+        <!--<finalName>${project.artifactId}</finalName>-->
+        <finalName>${project.name}</finalName>
         <defaultGoal>clean resources:resources install</defaultGoal>
         <resources>
             <resource>
