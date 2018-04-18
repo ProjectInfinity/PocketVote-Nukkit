@@ -1,3 +1,4 @@
+language: java
 deploy:
   provider: releases
   api_key:
