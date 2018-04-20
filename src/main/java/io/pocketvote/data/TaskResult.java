@@ -43,11 +43,12 @@ public class TaskResult {
 
         ArrayList<LinkedHashMap<String, String>> votes = new ArrayList<>();
 
-        claims.values().stream().filter(o -> o instanceof LinkedHashMap).forEach(o -> {
-            LinkedHashMap<String, String> vote = ((LinkedHashMap) o);
+        for(Object obj : (ArrayList) claims.values().toArray()[0]) {
+            if(!(obj instanceof LinkedHashMap)) continue;
+            LinkedHashMap<String, String> vote = (LinkedHashMap<String, String>) obj;
             if(!vote.containsKey("ip")) vote.put("ip", "127.0.0.1");
             votes.add(vote);
-        });
+        }
 
         setVotes(votes);
     }

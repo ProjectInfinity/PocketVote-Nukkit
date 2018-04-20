@@ -64,9 +64,6 @@ public class VoteCheckTask extends ApiRequest {
             return;
         }
 
-        System.out.println(result.hasVotes());
-        System.out.println(result.getVotes());
-
         for(LinkedHashMap<String, String> vote : result.getVotes()) {
             server.getPluginManager().callEvent(new VoteEvent(vote.get("player"), vote.get("ip"), vote.get("site")));
         }
