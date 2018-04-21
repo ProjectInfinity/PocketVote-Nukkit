@@ -2,9 +2,11 @@ package io.pocketvote;
 
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.scheduler.TaskHandler;
+import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.TextFormat;
 import io.pocketvote.listener.VoteListener;
 import io.pocketvote.cmd.PocketVoteCommand;
+import io.pocketvote.task.ExpireVotesTask;
 import io.pocketvote.task.SchedulerTask;
 import io.pocketvote.util.VoteManager;
 
@@ -50,13 +52,13 @@ public class PocketVote extends PluginBase {
 
     @Override
     public void onEnable() {
-        /**
+        /*
+         * List of things I need to do.
          * TODO: Add GURU support.
          * TODO: Add TopVoter
          * TODO: Add Vote link.
          * TODO: Add diagnose.
          * TODO: Add heartbeat.
-         * TODO: Add expire.
          */
         plugin = this;
         saveDefaultConfig();
@@ -77,14 +79,15 @@ public class PocketVote extends PluginBase {
         getServer().getCommandMap().register("pocketvote", new PocketVoteCommand(plugin));
 
         /* Register tasks */
-        this.tasks = new ArrayList<>();
+        tasks = new ArrayList<>();
+        tasks.add(getServer().getScheduler().scheduleRepeatingTask(plugin, new ExpireVotesTask(plugin), 6000).getTaskId());
 
         schedulerTask = getServer().getScheduler().scheduleRepeatingTask(plugin, new SchedulerTask(plugin), 1200); // 1200 = 60 seconds.
     }
 
     @Override
     public void onDisable() {
-        for(int task : tasks) getServer().getScheduler().cancelTask(task); // TODO: Figure out if I can remove the tasks array.
+        for(int task : tasks) getServer().getScheduler().cancelTask(task);
         getServer().getScheduler().cancelTask(schedulerTask.getTaskId());
         plugin = null;
     }
@@ -177,12 +180,24 @@ public class PocketVote extends PluginBase {
             getConfig().set("multi-server.mysql.database", "pocketvote");
             getConfig().set("version", 2);
             saveConfig();
+            reloadConfig();
         }
         if(plugin.getConfig().getInt("version", 2) == 2) {
-            getLogger().info(TextFormat.YELLOW + "Migrating config to version 3");
+            getLogger().info(TextFormat.YELLOW + "Migrating config to version 3.");
             getConfig().set("development", false);
             getConfig().set("version", 3);
             saveConfig();
+            reloadConfig();
+        }
+        if(plugin.getConfig().getInt("version", 3) == 3) {
+            getLogger().info(TextFormat.YELLOW + "Migrating config to version 4.");
+            for(Object v : (ArrayList) getConfig().getList("votes", new ArrayList())) {
+                ((ConfigSection) v).set("expires", Instant.now().getEpochSecond() + (86400 * 7));
+            }
+            getConfig().set("vote-expiration", 7);
+            getConfig().set("version", 4);
+            saveConfig();
+            reloadConfig();
         }
     }
 

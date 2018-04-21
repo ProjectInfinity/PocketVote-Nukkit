@@ -13,7 +13,7 @@
         <directory>src/main/resources</directory>
       </resource>
     </resources>
-    <finalName>${project.artifactId}</finalName>
+    <finalName>${project.name}</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>

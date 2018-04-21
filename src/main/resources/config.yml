@@ -1,8 +1,9 @@
-version: 3
+version: 4
 development: false
 identity: ''
 secret: ''
 lock: false
+vote-expiration: 7
 multi-server:
   enabled: false
   role: 'master'

@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -121,6 +122,22 @@ public class VoteManager {
     public void removeVRCTask(String player) {
         if(!vrcTasks.containsKey(player)) return;
         vrcTasks.remove(player);
+    }
+
+    public int expireVotes() {
+        int expired = 0;
+        Iterator<HashMap<String, String>> votes = getVotes();
+
+        if(!votes.hasNext()) return expired;
+        while(votes.hasNext()) {
+            HashMap<String, String> vote = votes.next();
+            if(!vote.containsKey("expires") || Instant.now().getEpochSecond() > Long.valueOf(String.valueOf(vote.get("expires")))) {
+                votes.remove();
+                expired++;
+            }
+        }
+        commit();
+        return expired;
     }
 
 }
