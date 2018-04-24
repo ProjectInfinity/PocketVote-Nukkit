@@ -21,24 +21,21 @@ public class ApiRequest extends AsyncTask {
 
     private String url;
     private String method;
+    private String action;
     private HashMap<String, String> postFields;
     private String identity;
     private String secret;
     private String version;
 
-    public ApiRequest(String url, String method, HashMap<String, String> postFields) {
+    public ApiRequest(String url, String method, String action, HashMap<String, String> postFields) {
         this.url = url;
         this.method = method;
+        this.action = action;
         this.postFields = postFields;
         this.identity = PocketVote.getPlugin().identity;
         this.secret = PocketVote.getPlugin().secret;
         this.version = PocketVote.getPlugin().getDescription().getVersion();
     }
-
-    /*@Override
-    public void onRun() {
-        // Overridden by the extending class.
-    }*/
 
     @Override
     public void onRun() {
@@ -93,10 +90,14 @@ public class ApiRequest extends AsyncTask {
                 return;
             }
 
-            // Only a successful API request can reach this.
-            if(result.hasPayload()) {
-                Jws<Claims> claims = Jwts.parser().setSigningKey(secret.getBytes("UTF-8")).parseClaimsJws(json.get("payload").asText());
-                result.setClaims(claims.getBody(), true);
+            switch(action) {
+                case "VOTE":
+                    // Only a successful API request can reach this.
+                    if(result.hasPayload()) {
+                        Jws<Claims> claims = Jwts.parser().setSigningKey(secret.getBytes("UTF-8")).parseClaimsJws(json.get("payload").asText());
+                        result.setClaims(claims.getBody(), true);
+                    }
+                    break;
             }
 
             setResult(result);

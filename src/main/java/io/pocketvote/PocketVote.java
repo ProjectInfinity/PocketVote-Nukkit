@@ -4,6 +4,7 @@ import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.scheduler.TaskHandler;
 import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.TextFormat;
+import io.pocketvote.cmd.VoteCommand;
 import io.pocketvote.listener.VoteListener;
 import io.pocketvote.cmd.PocketVoteCommand;
 import io.pocketvote.task.ExpireVotesTask;
@@ -55,7 +56,6 @@ public class PocketVote extends PluginBase {
         /*
          * List of things I need to do.
          * TODO: Add GURU support.
-         * TODO: Add TopVoter
          * TODO: Add Vote link.
          * TODO: Add diagnose.
          * TODO: Add heartbeat.
@@ -77,6 +77,7 @@ public class PocketVote extends PluginBase {
 
         getServer().getPluginManager().registerEvents(new VoteListener(plugin), plugin);
         getServer().getCommandMap().register("pocketvote", new PocketVoteCommand(plugin));
+        getServer().getCommandMap().register("vote", new VoteCommand(plugin));
 
         /* Register tasks */
         tasks = new ArrayList<>();
@@ -168,7 +169,7 @@ public class PocketVote extends PluginBase {
         return vm;
     }
 
-    public void updateConfig() {
+    private void updateConfig() {
         if(plugin.getConfig().getInt("version", 1) == 1) {
             getLogger().info(TextFormat.YELLOW + "Migrating config to version 2.");
             getConfig().set("multi-server.enabled", false);

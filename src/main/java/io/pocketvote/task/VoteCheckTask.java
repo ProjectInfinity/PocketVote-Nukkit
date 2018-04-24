@@ -25,18 +25,10 @@ import java.util.LinkedHashMap;
 public class VoteCheckTask extends ApiRequest {
 
     private PocketVote plugin;
-    private String identity;
-    private String secret;
-    private String version;
-    private boolean dev;
 
-    public VoteCheckTask(PocketVote plugin, String identity, String secret, String version) {
-        super(plugin.isDev() ? "http://127.0.0.1:9000/v2/check" : "https://api.pocketvote.io/v2/check", "GET", null);
+    public VoteCheckTask(PocketVote plugin) {
+        super(plugin.isDev() ? "http://127.0.0.1:9000/v2/check" : "https://api.pocketvote.io/v2/check", "GET", "VOTE", null);
         this.plugin = plugin;
-        this.identity = identity;
-        this.secret = secret;
-        this.version = version;
-        this.dev = plugin.isDev();
 
         plugin.getLogger().debug("Checking for outstanding votes.");
     }
@@ -44,7 +36,7 @@ public class VoteCheckTask extends ApiRequest {
     @Override
     public void onCompletion(Server server) {
         if(!(super.getResult() instanceof TaskResult)) {
-            server.getLogger().error("Result of " + getClass().getCanonicalName() + " was not an instance of TaskResult.");
+            server.getLogger().error("[PocketVote] Result of " + getClass().getCanonicalName() + " was not an instance of TaskResult.");
             return;
         }
 
