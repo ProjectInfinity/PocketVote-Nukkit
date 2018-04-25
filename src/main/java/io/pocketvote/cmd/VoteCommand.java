@@ -27,7 +27,20 @@ public class VoteCommand extends Command implements PluginIdentifiableCommand {
             plugin.getServer().getScheduler().scheduleAsyncTask(plugin, new TopVoterTask(plugin, sender.getName()));
             return true;
         }
-        return false; // TODO: Add vote link here when "top" is not specified.
+
+        String link = plugin.getVoteManager().getVoteLink();
+        if(link == null) {
+            if(sender.hasPermission("pocketvote.admin")) {
+                sender.sendMessage(TextFormat.YELLOW + "You can add a link by typing /guadd");
+                sender.sendMessage(TextFormat.YELLOW + "See /guru for help!");
+            } else {
+                sender.sendMessage(TextFormat.YELLOW + "The server operator has not added any voting sites.");
+            }
+            return true;
+        }
+        if(sender.hasPermission("pocketvote.admin")) sender.sendMessage(TextFormat.YELLOW + "Use /guru to manage this link.");
+        sender.sendMessage(TextFormat.AQUA + "You can vote at " + TextFormat.YELLOW + link);
+        return true;
     }
 
     @Override

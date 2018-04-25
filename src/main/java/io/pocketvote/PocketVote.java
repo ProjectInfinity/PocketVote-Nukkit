@@ -9,6 +9,7 @@ import io.pocketvote.listener.VoteListener;
 import io.pocketvote.cmd.PocketVoteCommand;
 import io.pocketvote.task.ExpireVotesTask;
 import io.pocketvote.task.SchedulerTask;
+import io.pocketvote.task.VoteLinkTask;
 import io.pocketvote.util.VoteManager;
 
 import java.io.IOException;
@@ -56,7 +57,6 @@ public class PocketVote extends PluginBase {
         /*
          * List of things I need to do.
          * TODO: Add GURU support.
-         * TODO: Add Vote link.
          * TODO: Add diagnose.
          * TODO: Add heartbeat.
          */
@@ -84,6 +84,9 @@ public class PocketVote extends PluginBase {
         tasks.add(getServer().getScheduler().scheduleRepeatingTask(plugin, new ExpireVotesTask(plugin), 6000).getTaskId());
 
         schedulerTask = getServer().getScheduler().scheduleRepeatingTask(plugin, new SchedulerTask(plugin), 1200); // 1200 = 60 seconds.
+
+        // Get vote link.
+        getServer().getScheduler().scheduleAsyncTask(plugin, new VoteLinkTask(plugin));
     }
 
     @Override

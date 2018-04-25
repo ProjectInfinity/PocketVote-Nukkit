@@ -26,6 +26,8 @@ public class VoteManager {
 
     private HashMap<String, TaskHandler> vrcTasks;
 
+    private String voteLink;
+
     public VoteManager(PocketVote plugin) {
         this.plugin = plugin;
         this.votes = plugin.getConfig().get("votes", new ArrayList<>());
@@ -38,6 +40,14 @@ public class VoteManager {
             if(vote.get("player").equalsIgnoreCase(player)) return true;
         }
         return false;
+    }
+
+    public void setVoteLink(String voteLink) {
+        this.voteLink = voteLink;
+    }
+
+    public String getVoteLink() {
+        return voteLink;
     }
 
     /*public Iterator<HashMap<String, String>> getVotes(String player) {
