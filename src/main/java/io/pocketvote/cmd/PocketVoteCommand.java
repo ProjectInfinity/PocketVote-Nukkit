@@ -6,6 +6,7 @@ import cn.nukkit.command.PluginIdentifiableCommand;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.utils.TextFormat;
 import io.pocketvote.PocketVote;
+import io.pocketvote.task.DiagnoseTask;
 import io.pocketvote.util.ToolBox;
 
 import java.util.Iterator;
@@ -59,6 +60,11 @@ public class PocketVoteCommand extends Command implements PluginIdentifiableComm
                 sender.sendMessage(TextFormat.GREEN + "Successfully set secret.");
                 plugin.getConfig().set("secret", plugin.secret);
                 plugin.saveConfig();
+                break;
+
+            case "DIAGNOSE":
+                sender.sendMessage(TextFormat.GREEN + "Scheduling a diagnosis...");
+                plugin.getServer().getScheduler().scheduleAsyncTask(plugin, new DiagnoseTask(plugin, sender.getName()));
                 break;
 
             case "CMD":

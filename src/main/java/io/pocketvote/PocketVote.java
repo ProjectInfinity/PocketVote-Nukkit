@@ -57,8 +57,8 @@ public class PocketVote extends PluginBase {
         /*
          * List of things I need to do.
          * TODO: Add GURU support.
-         * TODO: Add diagnose.
          * TODO: Add heartbeat.
+         * TODO: Add /pocketvote link to change link.
          */
         plugin = this;
         saveDefaultConfig();
