@@ -30,7 +30,7 @@ public class TopVoterTask extends ApiRequest {
             return;
         }
 
-        TaskResult result = (TaskResult) getResult();
+        var result = (TaskResult) getResult();
 
         if(result.hasError()) {
             player.sendMessage(TextFormat.RED + "An error occurred while contacting the PocketVote servers, please try again later.");
@@ -44,8 +44,8 @@ public class TopVoterTask extends ApiRequest {
         }
 
         player.sendMessage(TextFormat.AQUA + "### Current top 10 voters ###");
-        int rank = 1;
-        boolean color = true;
+        var rank = 1;
+        var color = true;
 
         for(final JsonNode vote : result.getRawPayload()) {
             player.sendMessage("" + (color ? TextFormat.WHITE : TextFormat.GRAY) + rank + ". " + vote.get("player").asText() + " (" + vote.get("votes").asInt() + ")");
