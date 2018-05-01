@@ -22,7 +22,7 @@ public class DiagnoseTask extends ApiRequest {
 
     @Override
     public void onCompletion(Server server) {
-        var player = this.player.equalsIgnoreCase("CONSOLE") ? new ConsoleCommandSender() : server.getPlayer(this.player);
+        CommandSender player = this.player.equalsIgnoreCase("CONSOLE") ? new ConsoleCommandSender() : server.getPlayer(this.player);
         if(player == null) return;
 
         if(!(super.getResult() instanceof TaskResult) || !hasResult() || !(getResult() instanceof TaskResult)) {
@@ -31,7 +31,7 @@ public class DiagnoseTask extends ApiRequest {
             return;
         }
 
-        var result = (TaskResult) getResult();
+        TaskResult result = (TaskResult) getResult();
 
         if(result.hasError()) {
             player.sendMessage(TextFormat.RED + "An error occurred while contacting the PocketVote servers, please try again later.");
@@ -45,13 +45,13 @@ public class DiagnoseTask extends ApiRequest {
             return;
         }
 
-        var payload = result.getRawPayload();
+        JsonNode payload = result.getRawPayload();
 
         player.sendMessage((payload.get("foundServer").asBoolean() ? TextFormat.GREEN + "Yes -" : TextFormat.RED + "No -") + " Found server");
         player.sendMessage((payload.get("hasVotes").asBoolean() ? TextFormat.GREEN + "Yes -" : TextFormat.RED + "No -") + " Has votes (trivial)");
 
         try {
-            var claims = Jwts.parser().setSigningKey(PocketVote.getPlugin().secret.getBytes("UTF-8")).parseClaimsJws(payload.get("voteSample").asText());
+            Jws<Claims> claims = Jwts.parser().setSigningKey(PocketVote.getPlugin().secret.getBytes("UTF-8")).parseClaimsJws(payload.get("voteSample").asText());
 
             if(claims.getBody().size() == 0) throw new Exception("Failed to parse token");
 

@@ -7,17 +7,20 @@ public class ToolBox {
      *
      * @return String
      */
-    public static String implode(String[] array, String glue) {
-        var out = new StringBuilder();
+    public static String implode( String[] array, String glue ) {
+        String out = "";
 
-        if(array.length == 0) return out.toString();
-
-        for(var part : array) {
-            if(part == null) continue;
-            out.append(part).append(glue);
+        if(array.length == 0) {
+            return out;
         }
 
-        return out.toString().substring(0, out.length() - glue.length());
+        for(String part : array) {
+            if(part == null) continue;
+            out = out + part + glue;
+        }
+        out = out.substring(0, out.length() - glue.length());
+
+        return out;
     }
 
     /**

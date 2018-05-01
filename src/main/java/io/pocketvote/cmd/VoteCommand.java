@@ -28,7 +28,7 @@ public class VoteCommand extends Command implements PluginIdentifiableCommand {
             return true;
         }
 
-        var link = plugin.getVoteManager().getVoteLink();
+        String link = plugin.getVoteManager().getVoteLink();
         if(link == null) {
             if(sender.hasPermission("pocketvote.admin")) {
                 sender.sendMessage(TextFormat.YELLOW + "You can add a link by typing /guadd");

@@ -74,10 +74,10 @@ public class PocketVoteCommand extends Command implements PluginIdentifiableComm
                 }
                 switch(args[1].toUpperCase()) {
                     case "LIST":
-                        var i = 0;
-                        var color = true;
+                        int i = 0;
+                        boolean color = true;
                         sender.sendMessage(TextFormat.YELLOW + "cmd, these run when a vote is made:");
-                        for(var cmd : plugin.cmds) {
+                        for(String cmd : plugin.cmds) {
                             i++;
                             sender.sendMessage((color ? TextFormat.WHITE : TextFormat.GRAY) + Integer.toString(i) + "/" + cmd);
                             color = !color;
@@ -91,7 +91,7 @@ public class PocketVoteCommand extends Command implements PluginIdentifiableComm
                         }
                         args[0] = null;
                         args[1] = null;
-                        var cmd = ToolBox.implode(args, " ");
+                        String cmd = ToolBox.implode(args, " ");
                         if(cmd.startsWith("/")) cmd = cmd.substring(1);
                         plugin.cmds.add(cmd);
 
@@ -108,9 +108,9 @@ public class PocketVoteCommand extends Command implements PluginIdentifiableComm
                         }
                         i = 0;
                         int icmd = Integer.parseInt(args[2]);
-                        var iterator = plugin.cmds.iterator();
+                        Iterator<String> iterator = plugin.cmds.iterator();
                         while(iterator.hasNext()) {
-                            var lcmd = iterator.next();
+                            String lcmd = iterator.next();
                             i++;
                             if(icmd > i) continue;
                             if(icmd == i) {
@@ -135,10 +135,10 @@ public class PocketVoteCommand extends Command implements PluginIdentifiableComm
                 }
                 switch(args[1].toUpperCase()) {
                     case "LIST":
-                        var i = 0;
-                        var color = true;
+                        int i = 0;
+                        boolean color = true;
                         sender.sendMessage(TextFormat.YELLOW + "cmdo, these run when the player is online:");
-                        for(var cmd : plugin.cmdos) {
+                        for(String cmd : plugin.cmdos) {
                             i++;
                             sender.sendMessage((color ? TextFormat.WHITE : TextFormat.GRAY) + Integer.toString(i) + "/" + cmd);
                             color = !color;
@@ -152,7 +152,7 @@ public class PocketVoteCommand extends Command implements PluginIdentifiableComm
                         }
                         args[0] = null;
                         args[1] = null;
-                        var cmd = ToolBox.implode(args, " ");
+                        String cmd = ToolBox.implode(args, " ");
                         if(cmd.startsWith("/")) cmd = cmd.substring(1);
                         plugin.cmdos.add(cmd);
 
@@ -169,9 +169,9 @@ public class PocketVoteCommand extends Command implements PluginIdentifiableComm
                         }
                         i = 0;
                         int icmd = Integer.parseInt(args[2]);
-                        var iterator = plugin.cmdos.iterator();
+                        Iterator<String> iterator = plugin.cmdos.iterator();
                         while(iterator.hasNext()) {
-                            var lcmd = iterator.next();
+                            String lcmd = iterator.next();
                             i++;
                             if(icmd > i) continue;
                             if(icmd == i) {

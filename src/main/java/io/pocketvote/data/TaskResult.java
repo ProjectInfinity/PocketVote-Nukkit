@@ -41,11 +41,11 @@ public class TaskResult {
         // If false we do not want to process claims into votes.
         if(!process) return;
 
-        var votes = new ArrayList<LinkedHashMap<String, String>>();
+        ArrayList<LinkedHashMap<String, String>> votes = new ArrayList<>();
 
-        for(var obj : (ArrayList) claims.values().toArray()[0]) {
+        for(Object obj : (ArrayList) claims.values().toArray()[0]) {
             if(!(obj instanceof LinkedHashMap)) continue;
-            var vote = (LinkedHashMap<String, String>) obj;
+            LinkedHashMap<String, String> vote = (LinkedHashMap<String, String>) obj;
             if(!vote.containsKey("ip")) vote.put("ip", "127.0.0.1");
             votes.add(vote);
         }
@@ -85,7 +85,7 @@ public class TaskResult {
     }
 
     public void setMeta(JsonNode meta) {
-        var m = new HashMap<String, Object>();
+        HashMap<String, Object> m = new HashMap<>();
         m.put("frequency", meta.get("frequency").asInt());
         this.meta = m;
     }
