@@ -7,8 +7,11 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.utils.TextFormat;
 import io.pocketvote.PocketVote;
 import io.pocketvote.task.DiagnoseTask;
+import io.pocketvote.task.SetLinkNameTask;
 import io.pocketvote.util.ToolBox;
 
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.Iterator;
 
 public class PocketVoteCommand extends Command implements PluginIdentifiableCommand {
@@ -186,6 +189,19 @@ public class PocketVoteCommand extends Command implements PluginIdentifiableComm
 
                     default:
                         sender.sendMessage(TextFormat.RED + "Invalid option. Use list, add or remove.");
+                }
+                break;
+
+            case "LINK":
+                if(args.length < 2) {
+                    sender.sendMessage(TextFormat.RED + "You need to specify a name. /pv link [name]");
+                    return true;
+                }
+                try {
+                    plugin.getServer().getScheduler().scheduleAsyncTask(plugin, new SetLinkNameTask(plugin, sender.getName(), args[1], ToolBox.createJWT(new HashMap<>(){{ put("name", args[1]); }})));
+                } catch(UnsupportedEncodingException e) {
+                    sender.sendMessage(TextFormat.DARK_RED + "An error occurred while trying to create your token.");
+                    e.printStackTrace();
                 }
                 break;
 

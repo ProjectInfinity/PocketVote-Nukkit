@@ -8,9 +8,11 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.pocketvote.PocketVote;
 import io.pocketvote.data.TaskResult;
+import io.pocketvote.util.ToolBox;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -22,12 +24,12 @@ public class ApiRequest extends AsyncTask {
     private String url;
     private String method;
     private String action;
-    private HashMap<String, String> postFields;
+    private HashMap<String, Object> postFields;
     private String identity;
     private String secret;
     private String version;
 
-    public ApiRequest(String url, String method, String action, HashMap<String, String> postFields) {
+    public ApiRequest(String url, String method, String action, HashMap<String, Object> postFields) {
         this.url = url;
         this.method = method;
         this.action = action;
@@ -51,6 +53,16 @@ public class ApiRequest extends AsyncTask {
             con.setRequestMethod(method);
             con.setRequestProperty("User-Agent", "PocketVote Nukkit v" + version);
             con.setRequestProperty("Identity", identity);
+
+            if(method.equalsIgnoreCase("POST")) {
+                con.setDoOutput(true);
+                System.out.println(postFields.get("token"));
+                byte[] postData = ToolBox.mapToPostString(postFields).getBytes();
+                con.setRequestProperty("Content-Length", Integer.toString(postFields.size()));
+                try(DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+                    wr.write(postData);
+                }
+            }
 
             int responseCode = con.getResponseCode();
 
