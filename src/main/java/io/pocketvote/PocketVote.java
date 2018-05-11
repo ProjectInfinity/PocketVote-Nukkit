@@ -55,6 +55,7 @@ public class PocketVote extends PluginBase {
     @Override
     public void onEnable() {
         /*
+         *
          * List of things I need to do.
          * TODO: Add GURU support.
          * TODO: Add heartbeat.
