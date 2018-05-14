@@ -8,6 +8,7 @@ import io.pocketvote.cmd.VoteCommand;
 import io.pocketvote.listener.VoteListener;
 import io.pocketvote.cmd.PocketVoteCommand;
 import io.pocketvote.task.ExpireVotesTask;
+import io.pocketvote.task.HeartbeatTask;
 import io.pocketvote.task.SchedulerTask;
 import io.pocketvote.task.VoteLinkTask;
 import io.pocketvote.util.VoteManager;
@@ -58,7 +59,6 @@ public class PocketVote extends PluginBase {
          *
          * List of things I need to do.
          * TODO: Add GURU support.
-         * TODO: Add heartbeat.
          */
         plugin = this;
         saveDefaultConfig();
@@ -87,6 +87,9 @@ public class PocketVote extends PluginBase {
 
         // Get vote link.
         getServer().getScheduler().scheduleAsyncTask(plugin, new VoteLinkTask(plugin));
+
+        // Report usage.
+        getServer().getScheduler().scheduleAsyncTask(plugin, new HeartbeatTask());
     }
 
     @Override
