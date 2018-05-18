@@ -56,7 +56,7 @@ public class ApiRequest extends AsyncTask {
 
             if(method.equalsIgnoreCase("POST")) {
                 con.setDoOutput(true);
-                System.out.println(postFields.get("token"));
+                System.out.println(postFields.get("token")); // TODO: Remove this line.
                 byte[] postData = ToolBox.mapToPostString(postFields).getBytes();
                 con.setRequestProperty("Content-Length", Integer.toString(postFields.size()));
                 try(DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
@@ -121,6 +121,7 @@ public class ApiRequest extends AsyncTask {
 
     private TaskResult createResult(boolean success) {
         TaskResult result = new TaskResult();
+        result.setIsSuccessful(success);
         result.setError(!success);
         return result;
     }

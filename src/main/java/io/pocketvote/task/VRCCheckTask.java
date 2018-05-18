@@ -62,7 +62,7 @@ public class VRCCheckTask extends AsyncTask {
 
                 // If the response code is not 200, assume something went wrong.
                 if(responseCode != 200) {
-                    results.add(createResult(true, null));
+                    results.add(createResult(false, true, null));
                     return;
                 }
 
@@ -102,7 +102,7 @@ public class VRCCheckTask extends AsyncTask {
                 rootNode.set("payload", payloadNode);
 
                 // Vote claim succeeded!
-                results.add(createResult(false, rootNode));
+                results.add(createResult(true, false, rootNode));
 
             } catch(IOException e) {
                 e.printStackTrace();
@@ -113,12 +113,13 @@ public class VRCCheckTask extends AsyncTask {
     }
 
     private TaskResult createErrorResult(String message) {
-        return new TaskResult(null, true, message);
+        return new TaskResult(null, true, false, message);
     }
 
-    private TaskResult createResult(boolean error, JsonNode json) {
+    private TaskResult createResult(boolean success, boolean error, JsonNode json) {
         TaskResult result = new TaskResult();
 
+        result.setIsSuccessful(success);
         result.setError(error);
 
         if(error) {

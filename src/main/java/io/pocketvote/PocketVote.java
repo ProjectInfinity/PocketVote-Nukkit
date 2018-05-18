@@ -4,9 +4,9 @@ import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.scheduler.TaskHandler;
 import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.TextFormat;
-import io.pocketvote.cmd.VoteCommand;
+import io.pocketvote.cmd.*;
+import io.pocketvote.cmd.guru.*;
 import io.pocketvote.listener.VoteListener;
-import io.pocketvote.cmd.PocketVoteCommand;
 import io.pocketvote.task.ExpireVotesTask;
 import io.pocketvote.task.HeartbeatTask;
 import io.pocketvote.task.SchedulerTask;
@@ -78,6 +78,12 @@ public class PocketVote extends PluginBase {
         getServer().getPluginManager().registerEvents(new VoteListener(plugin), plugin);
         getServer().getCommandMap().register("pocketvote", new PocketVoteCommand(plugin));
         getServer().getCommandMap().register("vote", new VoteCommand(plugin));
+
+        // Register MCPE.Guru commands.
+        getServer().getCommandMap().register("guru", new GuruCommand());
+        getServer().getCommandMap().register("guadd", new GuAddCommand(plugin));
+        //getServer().getCommandMap().register("gudel", new GuDelCommand(plugin));
+        //getServer().getCommandMap().register("gulist", new GuListCommand(plugin));
 
         /* Register tasks */
         tasks = new ArrayList<>();

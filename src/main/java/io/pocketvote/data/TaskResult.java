@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 public class TaskResult {
 
     private ArrayList<LinkedHashMap<String, String>> votes;
+    private boolean success;
     private boolean error;
     private String message;
     private HashMap<String, Object> meta;
@@ -21,18 +22,21 @@ public class TaskResult {
         this.votes = new ArrayList<>();
         this.error = false;
         this.message = null;
+        this.success = false;
     }
 
     public TaskResult(ArrayList<LinkedHashMap<String, String>> votes) {
         this.votes = votes;
         this.message = null;
         this.error = false;
+        this.success = true;
     }
 
-    public TaskResult(ArrayList<LinkedHashMap<String, String>> votes, boolean error, String message) {
+    public TaskResult(ArrayList<LinkedHashMap<String, String>> votes, boolean error, boolean success, String message) {
         this.votes = votes;
         this.error = error;
         this.message = message;
+        this.success = success;
     }
 
     public void setClaims(Claims claims, boolean process) {
@@ -108,6 +112,14 @@ public class TaskResult {
 
     public boolean hasMeta() {
         return meta != null && meta.size() > 0;
+    }
+
+    public boolean isSuccessful() {
+        return success;
+    }
+
+    public void setIsSuccessful(boolean success) {
+        this.success = success;
     }
 
 }
