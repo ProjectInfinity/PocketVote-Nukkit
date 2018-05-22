@@ -14,9 +14,9 @@ public class GuAddCommand extends Command {
 
     private PocketVote plugin;
 
-    public GuAddCommand(PocketVote plugin) {
+    public GuAddCommand() {
         super("guadd", "MCPE Guru Add link command", "/guadd [url]", new String[]{"gua"});
-        this.plugin = plugin;
+        this.plugin = PocketVote.getPlugin();
     }
 
     @Override

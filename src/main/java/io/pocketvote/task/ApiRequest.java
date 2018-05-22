@@ -28,6 +28,7 @@ public class ApiRequest extends AsyncTask {
     private String identity;
     private String secret;
     private String version;
+    private boolean dev;
 
     public ApiRequest(String url, String method, String action, HashMap<String, Object> postFields) {
         this.url = url;
@@ -37,6 +38,7 @@ public class ApiRequest extends AsyncTask {
         this.identity = PocketVote.getPlugin().identity;
         this.secret = PocketVote.getPlugin().secret;
         this.version = PocketVote.getPlugin().getDescription().getVersion();
+        this.dev = PocketVote.getPlugin().isDev();
     }
 
     @Override
@@ -56,7 +58,6 @@ public class ApiRequest extends AsyncTask {
 
             if(method.equalsIgnoreCase("POST")) {
                 con.setDoOutput(true);
-                System.out.println(postFields.get("token")); // TODO: Remove this line.
                 byte[] postData = ToolBox.mapToPostString(postFields).getBytes();
                 con.setRequestProperty("Content-Length", Integer.toString(postFields.size()));
                 try(DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
@@ -85,8 +86,7 @@ public class ApiRequest extends AsyncTask {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode json = mapper.readTree(response.toString());
 
-            // TODO: Remove this line.
-            System.out.println(json.toString());
+            if(dev) System.out.println("[PocketVote]" + json.toString());
 
             boolean success = json.hasNonNull("success") && json.get("success").asBoolean();
             TaskResult result = createResult(success);

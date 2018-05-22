@@ -55,11 +55,6 @@ public class PocketVote extends PluginBase {
 
     @Override
     public void onEnable() {
-        /*
-         *
-         * List of things I need to do.
-         * TODO: Add GURU support.
-         */
         plugin = this;
         saveDefaultConfig();
         reloadSettings();
@@ -81,8 +76,8 @@ public class PocketVote extends PluginBase {
 
         // Register MCPE.Guru commands.
         getServer().getCommandMap().register("guru", new GuruCommand());
-        getServer().getCommandMap().register("guadd", new GuAddCommand(plugin));
-        //getServer().getCommandMap().register("gudel", new GuDelCommand(plugin));
+        getServer().getCommandMap().register("guadd", new GuAddCommand());
+        getServer().getCommandMap().register("gudel", new GuDelCommand());
         getServer().getCommandMap().register("gulist", new GuListCommand());
 
         /* Register tasks */

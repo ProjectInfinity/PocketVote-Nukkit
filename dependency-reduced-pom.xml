@@ -98,8 +98,8 @@
   </profiles>
   <repositories>
     <repository>
-      <id>potestas-repo</id>
-      <url>https://repo.potestas.xyz/main</url>
+      <id>nukkit-repo</id>
+      <url>https://repo.nukkitx.com/snapshot</url>
     </repository>
   </repositories>
   <pluginRepositories>
