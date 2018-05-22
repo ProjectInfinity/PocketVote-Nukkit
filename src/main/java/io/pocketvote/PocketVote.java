@@ -83,7 +83,7 @@ public class PocketVote extends PluginBase {
         getServer().getCommandMap().register("guru", new GuruCommand());
         getServer().getCommandMap().register("guadd", new GuAddCommand(plugin));
         //getServer().getCommandMap().register("gudel", new GuDelCommand(plugin));
-        //getServer().getCommandMap().register("gulist", new GuListCommand(plugin));
+        getServer().getCommandMap().register("gulist", new GuListCommand());
 
         /* Register tasks */
         tasks = new ArrayList<>();

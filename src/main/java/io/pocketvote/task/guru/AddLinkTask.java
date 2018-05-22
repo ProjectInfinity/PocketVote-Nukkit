@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 public class AddLinkTask extends ApiRequest {
 
-    private PocketVote plugin;
     private String name;
 
     public AddLinkTask(String name, String token) {
@@ -21,7 +20,6 @@ public class AddLinkTask extends ApiRequest {
                 put("token", token);
             }
         });
-        this.plugin = PocketVote.getPlugin();
         this.name = name;
     }
 
