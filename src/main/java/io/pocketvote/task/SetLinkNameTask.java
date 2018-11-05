@@ -16,7 +16,7 @@ public class SetLinkNameTask extends ApiRequest {
     private String name;
 
     public SetLinkNameTask(PocketVote plugin, String player, String name, String token) {
-        super(plugin.isDev() ? "http://dev.mcpe.guru/api/name" : "https://mcpe.guru/api/name", "POST", "SETLINK", new HashMap<>() {
+        super(plugin.isDev() ? "http://dev.mcpe.guru/api/name" : "https://mcpe.guru/api/name", "POST", "SETLINK", new HashMap<String, Object>() {
             {
                 put("token", token);
             }

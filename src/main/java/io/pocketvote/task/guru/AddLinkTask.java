@@ -15,7 +15,7 @@ public class AddLinkTask extends ApiRequest {
     private String name;
 
     public AddLinkTask(String name, String token) {
-        super(PocketVote.getPlugin().isDev() ? "http://dev.mcpe.guru/api/link" : "https://mcpe.guru/api/link", "POST", "ADDLINK", new HashMap<>() {
+        super(PocketVote.getPlugin().isDev() ? "http://dev.mcpe.guru/api/link" : "https://mcpe.guru/api/link", "POST", "ADDLINK", new HashMap<String, Object>() {
             {
                 put("token", token);
             }

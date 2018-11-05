@@ -198,7 +198,7 @@ public class PocketVoteCommand extends Command implements PluginIdentifiableComm
                     return true;
                 }
                 try {
-                    plugin.getServer().getScheduler().scheduleAsyncTask(plugin, new SetLinkNameTask(plugin, sender.getName(), args[1], ToolBox.createJWT(new HashMap<>(){{ put("name", args[1]); }})));
+                    plugin.getServer().getScheduler().scheduleAsyncTask(plugin, new SetLinkNameTask(plugin, sender.getName(), args[1], ToolBox.createJWT(new HashMap<String, Object>(){{ put("name", args[1]); }})));
                 } catch(UnsupportedEncodingException e) {
                     sender.sendMessage(TextFormat.DARK_RED + "An error occurred while trying to create your token.");
                     e.printStackTrace();
