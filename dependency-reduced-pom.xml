@@ -4,7 +4,7 @@
   <groupId>io.pocketvote</groupId>
   <artifactId>PocketVote</artifactId>
   <name>PocketVote</name>
-  <version>2.0.0</version>
+  <version>2.0.1</version>
   <build>
     <defaultGoal>clean resources:resources install</defaultGoal>
     <resources>
