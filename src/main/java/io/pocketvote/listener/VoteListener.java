@@ -6,11 +6,11 @@ import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import io.pocketvote.PocketVote;
+import io.pocketvote.data.Vote;
 import io.pocketvote.event.VoteDispatchEvent;
 import io.pocketvote.event.VoteEvent;
 import io.pocketvote.util.VoteManager;
 
-import java.util.HashMap;
 import java.util.Iterator;
 
 public class VoteListener implements Listener {
@@ -60,19 +60,19 @@ public class VoteListener implements Listener {
 
         ConsoleCommandSender sender = plugin.getServer().getConsoleSender();
 
-        Iterator<HashMap<String, String>> votes = vm.getVotes();
+        Iterator<Vote> votes = vm.getVotes();
 
         if(!votes.hasNext()) return;
 
         while(votes.hasNext()) {
-            HashMap<String, String> vote = votes.next();
-            if(!vote.get("player").equalsIgnoreCase(event.getPlayer().getName())) continue;
-            plugin.getServer().getPluginManager().callEvent(new VoteDispatchEvent(vote.get("player"), vote.get("ip"), vote.get("site")));
+            Vote vote = votes.next();
+            if(!vote.getPlayer().equalsIgnoreCase(event.getPlayer().getName())) continue;
+            plugin.getServer().getPluginManager().callEvent(new VoteDispatchEvent(vote.getPlayer(), vote.getIp(), vote.getSite()));
             for(String cmd : plugin.cmdos) {
                 plugin.getServer().dispatchCommand(sender, cmd
-                        .replaceAll("%player", vote.get("player"))
-                        .replaceAll("%ip", vote.get("ip"))
-                        .replaceAll("%site", vote.get("site"))
+                        .replaceAll("%player", vote.getPlayer())
+                        .replaceAll("%ip", vote.getIp())
+                        .replaceAll("%site", vote.getSite())
                 );
             }
             votes.remove();

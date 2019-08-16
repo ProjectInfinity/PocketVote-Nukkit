@@ -1,11 +1,13 @@
 package io.pocketvote.util;
 
 import cn.nukkit.scheduler.TaskHandler;
+import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.TextFormat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.pocketvote.PocketVote;
 import io.pocketvote.data.VRCRecord;
+import io.pocketvote.data.Vote;
 import io.pocketvote.task.VRCCheckTask;
 
 import java.io.File;
@@ -16,12 +18,13 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 public class VoteManager {
 
     private PocketVote plugin;
 
-    private ArrayList<HashMap<String, String>> votes;
+    private List<Vote> votes;
     private ArrayList<VRCRecord> vrcs;
 
     private HashMap<String, TaskHandler> vrcTasks;
@@ -30,14 +33,14 @@ public class VoteManager {
 
     public VoteManager(PocketVote plugin) {
         this.plugin = plugin;
-        this.votes = plugin.getConfig().get("votes", new ArrayList<>());
+        this.votes = loadVotes();
         this.vrcs = new ArrayList<>();
         this.vrcTasks = new HashMap<>();
     }
 
     public boolean hasVotes(String player) {
-        for(HashMap<String, String> vote : votes) {
-            if(vote.get("player").equalsIgnoreCase(player)) return true;
+        for(Vote vote : votes) {
+            if(vote.getPlayer().equalsIgnoreCase(player)) return true;
         }
         return false;
     }
@@ -63,20 +66,20 @@ public class VoteManager {
         return votes.iterator();
     }*/
 
-    public Iterator<HashMap<String, String>> getVotes() {
+    public Iterator<Vote> getVotes() {
         return votes.iterator();
     }
 
     public void addVote(String player, String site, String ip) {
-        HashMap<String, String> vote = new HashMap<>();
-        vote.put("player", player);
-        vote.put("site", site);
-        vote.put("ip", ip);
-        votes.add(vote);
+        votes.add(new Vote(player, site, ip, Instant.now().getEpochSecond() + (86400 * plugin.getConfig().getInt("vote-expiration", 7))));
     }
 
     public void commit() {
-        plugin.getConfig().set("votes", votes);
+    	List<HashMap<String, String>> commitVote = new ArrayList<>();
+    	for (Vote vote : votes ) {
+    		commitVote.add(vote.saveVote());
+    	}
+        plugin.getConfig().set("votes", commitVote);
         plugin.saveConfig();
     }
 
@@ -136,12 +139,14 @@ public class VoteManager {
 
     public int expireVotes() {
         int expired = 0;
-        Iterator<HashMap<String, String>> votes = getVotes();
+        Iterator<Vote> votes = getVotes();
 
         if(!votes.hasNext()) return expired;
         while(votes.hasNext()) {
-            HashMap<String, String> vote = votes.next();
-            if(!vote.containsKey("expires") || Instant.now().getEpochSecond() > Long.valueOf(String.valueOf(vote.get("expires")))) {
+            Vote vote = votes.next();
+            
+            if(Instant.now().getEpochSecond() > vote.getExpires()) {
+            	System.out.println(vote.getPlayer() + " delted");
                 votes.remove();
                 expired++;
             }
@@ -149,5 +154,19 @@ public class VoteManager {
         commit();
         return expired;
     }
+    
+    private List<Vote> loadVotes() {
+		List<Vote> loadVotes = new ArrayList<>();
+		if(plugin.getConfig().getList("votes") != null) {
+			for (Object v : (ArrayList<?>) plugin.getConfig().getList("votes", new ArrayList<Object>())) {
+				if (v instanceof ConfigSection) {
+					loadVotes.add(new Vote((ConfigSection) v));
+				} else {
+					plugin.getLogger().debug("unknown vote data structure");
+				}
+			}			
+		}
+		return loadVotes;
+	}
 
 }
