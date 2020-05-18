@@ -1,26 +1,11 @@
 package io.pocketvote.task;
 
+import java.util.LinkedHashMap;
+
 import cn.nukkit.Server;
-import cn.nukkit.scheduler.AsyncTask;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.impl.DefaultClaims;
 import io.pocketvote.PocketVote;
 import io.pocketvote.data.TaskResult;
 import io.pocketvote.event.VoteEvent;
-
-import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 public class VoteCheckTask extends ApiRequest {
 

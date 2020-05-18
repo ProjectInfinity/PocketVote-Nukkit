@@ -3,7 +3,6 @@ package io.pocketvote.task;
 import cn.nukkit.Server;
 import cn.nukkit.scheduler.AsyncTask;
 import io.pocketvote.PocketVote;
-import io.pocketvote.util.ToolBox;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
