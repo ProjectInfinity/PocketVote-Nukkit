@@ -11,7 +11,7 @@ import io.pocketvote.event.VoteEvent;
 public class VoteCheckTask extends ApiRequest {
 
     private PocketVote plugin;
-    private static final Pattern namePattern = Pattern.compile("^[a-zA-Z0-9_]{1,16}$");
+    private static final Pattern namePattern = Pattern.compile("^[a-zA-Z0-9_ ]{1,16}$");
     
     public VoteCheckTask(PocketVote plugin) {
         super(plugin.isDev() ? "http://127.0.0.1:9000/v2/check" : "https://api.pocketvote.io/v2/check", "GET", "VOTE", null);
