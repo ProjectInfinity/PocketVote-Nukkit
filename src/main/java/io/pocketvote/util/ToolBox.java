@@ -5,7 +5,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.pocketvote.PocketVote;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 

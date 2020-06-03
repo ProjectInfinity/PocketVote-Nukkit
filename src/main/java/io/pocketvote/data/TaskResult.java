@@ -2,8 +2,6 @@ package io.pocketvote.data;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.jsonwebtoken.Claims;
-import io.pocketvote.event.VoteEvent;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
